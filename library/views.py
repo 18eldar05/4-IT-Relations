@@ -37,7 +37,7 @@ class GenreCreateView(APIView):
         serializer = GenreSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"Genre has been created": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Genre has been created", "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
 class AuthorCreateView(APIView):
@@ -47,7 +47,7 @@ class AuthorCreateView(APIView):
         serializer = AuthorSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"Author has been created": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Author has been created", "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
 class BookCreateView(APIView):
@@ -57,7 +57,7 @@ class BookCreateView(APIView):
         serializer = BookSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"Book has been created": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Book has been created", "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
 class ReadingRoomCreateView(APIView):
@@ -67,7 +67,7 @@ class ReadingRoomCreateView(APIView):
         serializer = ReadingRoomSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"Reading room has been created": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Reading room has been created", "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
 class IssuanceCreateView(APIView):
@@ -78,19 +78,24 @@ class IssuanceCreateView(APIView):
         if not pk:
             return Response({"error": "Method POST not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        user = get_object_or_404(User, pk=request.data["reader"])
+        request_data = request.data.copy()
+
+        if "reader" not in request_data:
+            request_data["reader"] = self.request.user.pk
+
+        user = get_object_or_404(User, pk=request_data["reader"])
         self.check_object_permissions(request, user)
 
-        instance = get_object_or_404(Book, pk=pk)
+        book = get_object_or_404(Book, pk=pk)
 
-        if instance.is_taken:
+        if book.is_taken:
             return Response({"error": "This book has already been taken"}, status=status.HTTP_400_BAD_REQUEST)
 
-        request.data["book"] = pk
-        instance.is_taken = True
-        instance.save()
+        request_data["book"] = pk
+        book.is_taken = True
+        book.save()
 
-        serializer = IssuanceSerializer(data=request.data)
+        serializer = IssuanceSerializer(data=request_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"Book has been issued": serializer.data}, status=status.HTTP_201_CREATED)
