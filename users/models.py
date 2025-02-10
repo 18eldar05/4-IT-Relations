@@ -9,4 +9,4 @@ class User(AbstractUser):
         librarian = "librarian"
         admin = "admin"
     role = models.CharField(max_length=9, choices=ChoiceRole, default=ChoiceRole.reader)
-    reading_room = models.ForeignKey(ReadingRoom, null=True, on_delete=models.PROTECT)
+    reading_room = models.ForeignKey(ReadingRoom, null=True, blank=True, on_delete=models.PROTECT)

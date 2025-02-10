@@ -19,6 +19,7 @@ class RegistrationView(APIView):
             data['response'] = 'Account has been created'
             data['username'] = account.username
             data['email'] = account.email
+            data['pk'] = account.pk
             refresh = RefreshToken.for_user(account)
             data['token'] = {
                 'refresh': str(refresh),
@@ -27,7 +28,7 @@ class RegistrationView(APIView):
         else:
             data = serializer.errors
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        return Response(data)
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class UserView(generics.RetrieveUpdateDestroyAPIView):

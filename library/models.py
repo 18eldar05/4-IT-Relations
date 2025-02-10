@@ -15,7 +15,7 @@ class ReadingRoom(models.Model):
 class Book(models.Model):
     name = models.CharField(max_length=255)
     author = models.ForeignKey('Author', on_delete=models.PROTECT)
-    genre = models.ForeignKey('Genre', null=True, on_delete=models.PROTECT)
+    genre = models.ForeignKey('Genre', null=True, blank=True, on_delete=models.PROTECT)
     reading_room = models.ForeignKey('ReadingRoom', on_delete=models.PROTECT)
     is_taken = models.BooleanField(default=False)
 
@@ -29,7 +29,7 @@ class Author(models.Model):
     country = models.CharField(max_length=255, null=True)
 
     def __str__(self):
-        return self.last_name
+        return '%s, %s' % (self.first_name, self.last_name)
 
 
 class Genre(models.Model):
@@ -44,7 +44,7 @@ User = get_user_model()
 
 class Issuance(models.Model):
     reader = models.ForeignKey(User, on_delete=models.PROTECT)
-    book = models.ForeignKey('Book', on_delete=models.PROTECT)
+    book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True)
     date_of_issue = models.DateTimeField(auto_now_add=True)
     date_of_return = models.DateTimeField(null=True)
     is_returned = models.BooleanField(default=False)
