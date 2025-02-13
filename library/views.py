@@ -147,6 +147,6 @@ class DebtView(APIView):
 
 
 class NotifyView(APIView):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         send_notification.delay()
         return Response({"Message": "Notifications started"})
