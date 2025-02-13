@@ -3,6 +3,10 @@ from django.urls import reverse
 from library.models import *
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
+from .service import send
+import datetime
+from datetime import datetime
+import time
 
 User = get_user_model()
 
@@ -18,11 +22,11 @@ class Test(TestCase):
         self.admin_user = User.objects.create_user(username='admin_user', password='12345', role='admin')
         self.admin_user.save()
         self.admin_access = str(RefreshToken.for_user(self.admin_user).access_token)
-        self.reader_user = User.objects.create_user(username='reader_user', password='12345')
+        self.reader_user = User.objects.create_user(username='reader_user', password='12345', email='18eldar05@gmail.com')
         self.reader_user.save()
         self.reader_access = str(RefreshToken.for_user(self.reader_user).access_token)
         self.book4 = Book.objects.create(is_taken=True, name='4', author=self.author, genre=self.genre, reading_room=self.reading_room)
-        Issuance.objects.create(reader=self.reader_user, book=self.book4, date_of_return="2025-04-13T12:00")
+        self.issuance = Issuance.objects.create(reader=self.reader_user, book=self.book4, date_of_return="2025-04-13T12:00")
 
     def test_safe_methods(self):
         resp = self.client.get(reverse('genre_pk', kwargs={'pk': self.genre.pk}))
@@ -142,3 +146,13 @@ class Test(TestCase):
         resp = self.client.post(reverse('return_the_book', kwargs={'pk': self.book4.pk}),
                                 headers={"Authorization": "Bearer " + self.admin_access})
         self.assertEqual(resp.status_code, 400)
+
+    def test_send_notification(self):
+        mails = send()
+        email = self.issuance.reader.email
+        book_name = self.issuance.book.name
+        return_date_datetime = datetime.strptime(self.issuance.date_of_return, "%Y-%m-%dT%H:%M")
+        return_date_pretty = time.asctime(return_date_datetime.timetuple())
+        remaining = return_date_datetime - datetime.now()
+        self.assertEqual(mails[0]["email"], email)
+        self.assertEqual(mails[0]["data"], f"Name: {book_name}, return date: {return_date_pretty}, time remaining: {remaining.days} days\n")

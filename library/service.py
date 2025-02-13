@@ -7,6 +7,7 @@ from library.serializer import *
 
 def send():
     users = User.objects.all()
+    mails = []
     for user in users:
         debts = Issuance.objects.filter(reader=user.pk, is_returned=False)
         if debts.exists():
@@ -22,3 +23,5 @@ def send():
                 [user.email],
                 fail_silently=False,
             )
+            mails.append({"email": user.email, "data": data})
+    return mails
