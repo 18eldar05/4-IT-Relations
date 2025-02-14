@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from users.permissions import *
 from library.serializer import *
+from .tasks import send_notification
 
 
 class GenreView(generics.RetrieveUpdateDestroyAPIView):
@@ -143,3 +144,9 @@ class DebtView(APIView):
             return Response({"No Content": "User has no debts"}, status=status.HTTP_204_NO_CONTENT)
 
         return Response({"List of debts": DebtSerializer(debt, many=True).data})
+
+
+class NotifyView(APIView):
+    def post(self, request, *args, **kwargs):
+        send_notification.delay()
+        return Response({"Message": "Notifications started"})

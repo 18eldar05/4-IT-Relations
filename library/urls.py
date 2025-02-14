@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/take_the_book/<int:pk>/', IssuanceCreateView.as_view(), name="take_the_book"),
     path('api/return_the_book/<int:pk>/', ReturnView.as_view(), name="return_the_book"),
     path('api/debt/<int:pk>/', DebtView.as_view(), name="debt"),
+    path('api/notify/', NotifyView.as_view(), name="notify"),
 ]
