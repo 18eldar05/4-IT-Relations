@@ -150,3 +150,17 @@ class NotifyView(APIView):
     def post(self, request, *args, **kwargs):
         send_notification.delay()
         return Response({"Message": "Notifications started"})
+
+
+def dashboard_callback(request, context):
+    """
+        Callback to prepare custom variables for index template which is used as dashboard
+        template. It can be overridden in application by creating custom admin/index.html.
+        """
+    context.update({
+        "subtitle": "mysubtitle",
+        "title": "mytitle",
+        "custom_variable": "value", # this will be injected into templates/admin/index.html
+    })
+
+    return context
