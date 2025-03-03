@@ -1,12 +1,6 @@
 import streamlit as st
-
 from streamlit_option_menu import option_menu
-
-import home, register_and_auth
-
-# st.set_page_config(
-#     page_title="Pondering"
-# )
+from pages import home, register_and_auth
 
 
 class MultiApp:
@@ -20,11 +14,19 @@ class MultiApp:
         })
 
     def run():
+        manual_select = st.session_state.get('menu_option', None)
+
+        if not manual_select == 0:
+            options = ["Home", "Account"]
+        else:
+            options = ["Home",]
+
         with st.sidebar:
             app = option_menu(
                 menu_title="Library",
-                options=["Home", "Account"],
+                options=options,
                 icons=["house-fill", "person-circle"],
+                manual_select=manual_select,
                 menu_icon="book",
                 default_index=1,
                 styles={}
