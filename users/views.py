@@ -41,3 +41,8 @@ class UserRoleView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRoleSerializer
     permission_classes = (IsAdmin,)
+
+
+class AllUsersView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

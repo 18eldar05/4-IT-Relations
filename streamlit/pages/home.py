@@ -2,4 +2,8 @@ import streamlit as st
 
 
 def app():
-    st.write("home")
+    username = st.session_state.get("username", None)
+    if username:
+        st.title(f"Hello, :red[{username}]!")
+    else:
+        st.title("Hello!")

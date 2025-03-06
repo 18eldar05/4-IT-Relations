@@ -36,6 +36,11 @@ class ReadingRoomView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsStaffOrReadOnly,)
 
 
+class AllBooksView(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+
 class GenreCreateView(APIView):
     permission_classes = (IsStaffOrReadOnly,)
 
@@ -136,9 +141,7 @@ class DebtView(APIView):
     permission_classes = (IsStaffOrOwner,)
 
     def get(self, request, *args, **kwargs):
-        pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method GET not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        pk = kwargs.get("pk", self.request.user.pk)
 
         user = get_object_or_404(User, pk=pk)
         self.check_object_permissions(request, user)
@@ -152,6 +155,8 @@ class DebtView(APIView):
 
 
 class NotifyView(APIView):
+    # permission_classes = (IsAdmin,)
+
     def post(self, request, *args, **kwargs):
         send_notification.delay()
         return Response({"Message": "Notifications started"})

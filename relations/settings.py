@@ -191,7 +191,8 @@ SIMPLE_JWT = {
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = '18eldar054@gmail.com'
-EMAIL_HOST_PASSWORD = 'fnaz msfy ewuj iocg'
+# EMAIL_HOST_PASSWORD = 'fnaz msfy ewuj iocg'
+EMAIL_HOST_PASSWORD = 'crty tubf frfq gylb'
 EMAIL_PORT = 587
 
 CELERY_BROKER_URL = 'amqp://guest:guest@127.0.0.1:5672//'
