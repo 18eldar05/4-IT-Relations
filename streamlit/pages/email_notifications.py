@@ -8,8 +8,12 @@ def app():
         "Authorization": "Bearer " + st.session_state["access"]
     }
     if st.button('Start'):
-        response = httpx.post("http://127.0.0.1:8000/api/notify/", headers=headers)
-        if response.status_code == 200:
-            st.success("Started successfully")
+        try:
+            response = httpx.post("http://127.0.0.1:8000/api/notify/", headers=headers)
+        except Exception as e:
+            st.error(f"Error: {type(e)}, {e}")
         else:
-            st.error(f"Error {response.status_code}: {response.text}")
+            if response.status_code == 200:
+                st.success("Started successfully")
+            else:
+                st.error(f"Error {response.status_code}: {response.text}")

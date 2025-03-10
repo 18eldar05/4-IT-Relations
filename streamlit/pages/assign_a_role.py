@@ -19,8 +19,12 @@ def app():
         "Authorization": "Bearer " + st.session_state["access"]
     }
     if st.button('Assign'):
-        response = httpx.patch(f"http://127.0.0.1:8000/api/role/{pk}/", json=data, headers=headers)
-        if response.status_code == 200:
-            st.success("Role changed successfully")
+        try:
+            response = httpx.patch(f"http://127.0.0.1:8000/api/role/{pk}/", json=data, headers=headers)
+        except Exception as e:
+            st.error(f"Error: {type(e)}, {e}")
         else:
-            st.error(f"Error {response.status_code}: {response.text}")
+            if response.status_code == 200:
+                st.success("Role changed successfully")
+            else:
+                st.error(f"Error {response.status_code}: {response.text}")
