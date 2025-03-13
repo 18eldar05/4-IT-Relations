@@ -1,34 +1,12 @@
 import streamlit as st
-import httpx
+from service import request, books_selectbox, URLS
 
 
-def app():
+def return_the_book():
     st.title("Return a :red[book]")
-    try:
-        books = httpx.get("http://127.0.0.1:8000/api/all_books/").json()
-    except Exception as e:
-        st.error(f"Error: {type(e)}, {e}")
-    else:
-        taken_books = []
-        for book in books:
-            if book["is_taken"]:
-                taken_books.append(book)
-        choice = st.selectbox("Taken books", [book["name"] for book in taken_books])
-        pk = None
-        for book in taken_books:
-            if choice == book["name"]:
-                pk = book["id"]
-                break
-        headers = {
-            "Authorization": "Bearer " + st.session_state["access"]
-        }
-        if st.button('Return'):
-            try:
-                response = httpx.post(f"http://127.0.0.1:8000/api/return_the_book/{pk}/", headers=headers)
-            except Exception as e:
-                st.error(f"Error: {type(e)}, {e}")
-            else:
-                if response.status_code == 200:
-                    st.success(response.text)
-                else:
-                    st.error(f"Error {response.status_code}: {response.text}")
+    pk = books_selectbox(is_taken=True)
+    headers = st.session_state["headers"]
+    if st.button('Return'):
+        response = request("post", f'{URLS["return_the_book"]}{pk}/', headers=headers)
+        if response:
+            st.success(response.text)
