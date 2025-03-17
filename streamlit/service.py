@@ -29,8 +29,10 @@ def request(method: str, url: str, **kwargs):
         st.error("Error: The server did not send any data in the allowed amount of time")
     except httpx.TimeoutException:
         st.error("Error: An operation has timed out. The server is probably sick. You can retry in several seconds")
+    except httpx.ConnectError:
+        st.error("Error: Couldn't connect to the server")
     except httpx.NetworkError:
-        st.error("Error: An error occurred while interacting with the network")
+        st.error("An error occurred while interacting with the network")
     except httpx.HTTPStatusError:
         st.error("Error " + str(response.status_code) + ": " + response.text)
     except httpx.InvalidURL:
@@ -65,3 +67,8 @@ def books_selectbox(**kwargs):
         for book in shortened_books:
             if choice == book["name"]:
                 return book["id"]
+
+
+@st.cache_data
+def cache(string: str):
+    return st.session_state.get(string)

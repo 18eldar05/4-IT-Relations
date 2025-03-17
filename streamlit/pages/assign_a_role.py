@@ -1,5 +1,5 @@
 import streamlit as st
-from service import request, users_selectbox, URLS
+from service import request, users_selectbox, URLS, cache
 
 
 def assign_a_role():
@@ -9,8 +9,7 @@ def assign_a_role():
     data = {
         "role": role_choice
     }
-    headers = st.session_state["headers"]
     if st.button('Assign'):
-        response = request("patch", f'{URLS["role"]}{pk}/', data=data, headers=headers)
+        response = request("patch", f'{URLS["role"]}{pk}/', data=data, headers=cache("headers"))
         if response:
             st.success("Role changed successfully")

@@ -1,18 +1,25 @@
 import streamlit as st
 from time import sleep
-from service import request, URLS
+from service import request, URLS, cache
 
 
 def register_and_auth():
     st.title("Welcome to :red[Library]")
     choice = st.selectbox("Log in/Sign up", ["Log in", "Sign up"])
-    if choice == "Log in":
-        response = log_in()
-    else:
-        response = sign_up()
+    functions = {
+        "Log in": log_in,
+        "Sign up": sign_up
+    }
+    response, username, role = functions[choice]()
     if response:
+        st.session_state["username"] = username
+        st.session_state["role"] = role
         st.session_state["headers"] = {"Authorization": "Bearer " + response.json()["access"]}
         st.session_state["refresh"] = response.json()["refresh"]
+        cache.clear()
+        cache("headers")
+        cache("username")
+        cache("role")
         st.session_state["menu_option"] = 0
         st.switch_page("main.py")
 
@@ -28,19 +35,16 @@ def log_in():
         response = request("post", URLS["token"], data=data)
         if response:
             st.success("Logged in successfully!")
-            # st.session_state["headers"] = {"Authorization": "Bearer " + response.json()["access"]}
-            # st.session_state["refresh"] = response.json()["refresh"]
-        st.session_state["username"] = username
-        users_response = request("get", URLS["all_users"])
-        if users_response:
-            users = users_response.json()
-            for user in users:
-                if username == user["username"]:
-                    st.session_state["role"] = user["role"]
-                    break
-        return response
-        # st.session_state["menu_option"] = 0
-        # st.switch_page("main.py")
+            role = None
+            users_response = request("get", URLS["all_users"])
+            if users_response:
+                users = users_response.json()
+                for user in users:
+                    if username == user["username"]:
+                        role = user["role"]
+                        break
+            return response, username, role
+    return None, None, None
 
 
 def sign_up():
@@ -62,10 +66,5 @@ def sign_up():
             st.success("Account created successfully!")
             st.balloons()
             sleep(1)
-            # st.session_state["headers"] = {"Authorization": "Bearer " + response.json()["token"]["access"]}
-            # st.session_state["refresh"] = response.json()["token"]["refresh"]
-        st.session_state["username"] = username
-        st.session_state["role"] = "reader"
-        return response
-        # st.session_state["menu_option"] = 0
-        # st.switch_page("main.py")
+            return response, username, "reader"
+    return None, None, None

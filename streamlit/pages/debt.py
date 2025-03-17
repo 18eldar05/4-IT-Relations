@@ -2,27 +2,26 @@ import streamlit as st
 import datetime
 from datetime import datetime
 import time
-from service import request, users_selectbox, URLS
+from service import request, users_selectbox, URLS, cache
 
 
 def view_debts():
-    role = st.session_state.get("role", None)
+    role = cache("role")
     if not role:
         st.title("You need to log in first")
     else:
-        headers = st.session_state["headers"]
         if not role == "reader":
             st.title(":red[Debts]")
             user_pk = users_selectbox()
             if user_pk:
-                response = request("get", f'{URLS["debt"]}{user_pk}/', headers=headers)
+                response = request("get", f'{URLS["debt"]}{user_pk}/', headers=cache("headers"))
                 no_debts_message = "User has no debts:ok_hand:"
             else:
-                response = request("get", URLS["debt"], headers=headers)
+                response = request("get", URLS["debt"], headers=cache("headers"))
                 no_debts_message = "You have no debts:thumbsup:"
         else:
             st.title("Your :red[debts]")
-            response = request("get", URLS["debt"], headers=headers)
+            response = request("get", URLS["debt"], headers=cache("headers"))
             no_debts_message = "You have no debts:thumbsup:"
 
         if response:

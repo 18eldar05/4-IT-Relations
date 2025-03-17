@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from pages import home, register_and_auth, take_the_book, debt, return_the_book, assign_a_role, logout
+from service import cache
 
 FUNCTIONS = {
     "Home": home.view_home,
@@ -38,7 +39,7 @@ class MultiApp:
         })
 
     def run():
-        role = st.session_state.get("role", None)
+        role = cache("role")
         manual_select = st.session_state.get('menu_option', None)
         with st.sidebar:
             app = option_menu(
@@ -47,7 +48,7 @@ class MultiApp:
                 icons=ICONS[role],
                 manual_select=manual_select,
                 menu_icon="book",
-                default_index=1,
+                default_index=0,
                 styles={}
             )
         FUNCTIONS[app]()

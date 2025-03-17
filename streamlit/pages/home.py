@@ -1,8 +1,9 @@
 import streamlit as st
+from service import cache
 
 
 def view_home():
-    username = st.session_state.get("username", None)
+    username = cache("username")
     if username:
         st.title(f"Hello, :red[{username}]!")
     else:
