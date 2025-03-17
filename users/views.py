@@ -21,10 +21,8 @@ class RegistrationView(APIView):
             data['email'] = account.email
             data['pk'] = account.pk
             refresh = RefreshToken.for_user(account)
-            data['token'] = {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token)
-            }
+            data['refresh'] = str(refresh)
+            data['access'] = str(refresh.access_token)
         else:
             data = serializer.errors
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
@@ -41,3 +39,8 @@ class UserRoleView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRoleSerializer
     permission_classes = (IsAdmin,)
+
+
+class AllUsersView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
